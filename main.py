@@ -20,7 +20,6 @@ import webapp2
 import jinja2
 import urllib
 
-from loader import Loader
 from google.appengine.ext import db 
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -78,6 +77,7 @@ class HomePage(MainHandler):
         raw_file_name = filename = self.request.POST.multi['file'].filename
         raw_file = self.request.POST.multi['file'].file
         self.load(raw_file)
+        self.redirect('/')
 
     def load(self, filestream):
         """ Load & parse csv data """
