@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wellspring Ex</title>
+		<link href="/static/bootstrap.css" rel="stylesheet">
+	</head>
+    
+	<body>
+		<div class="container">
+			<h1>Wellspring Ex</h1>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+					{% for head in kwargs["head"] %}
+						 <th>{{head}}</th>
+					{% endfor %}
+					</tr>
+				</thead>
+			
+				<tbody>
+				{% for entry in kwargs["entry"] %}
+					<tr>
+					{% for item in entry %}
+						<td>{{item}}</td>
+					{% endfor %}	
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+
+		  <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file"><br />
+        <input type="submit" value="Upload">
+      </form>
+		</div>
+	</body>
+</html>
