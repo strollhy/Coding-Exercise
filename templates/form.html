@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>Wellspring Ex</title>
+		<link href="/static/bootstrap.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<div class="container">
+			<h1>{{form_type}}</h1>
+			<form id="form" method="post">
+				<table class="table table-striped">
+					<tr>
+						<td> 
+							<label>Train line</label>
+							<input id="line" type="text" name="line" value="{{line}}">
+						</td>
+						<td> 
+							<label>Train route</label>
+							<input id="route" type="text" name="route" value="{{route}}">
+						</td>
+						<td> 
+							<label>Run number</label>
+							<input id="number" type="text" name="number" value="{{number}}">
+						</td>
+						<td> 
+							<label>Opeartor ID</label>
+							<input id="op_id" type="text" name="op_id" value="{{op_id}}">
+						</td>
+					</tr>
+				</table>
+				<input type="submit" value="Update">
+				<input id="form_type" type="text" style="display:none" name="from_type" value="{{form_type}}">
+			</form>
+		</div>
+	</body>
+</html>
