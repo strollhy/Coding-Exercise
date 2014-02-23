@@ -27,11 +27,29 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
+class Entry(db.Model):
+    """ Database entry class
+
+    Attributes:
+        line: Train line.
+        route: Train route.
+        number: Run number.
+        op_id: Operator ID.
+    """
+    line = db.StringProperty(required = True)
+    route = db.StringProperty(required = True)
+    number = db.StringProperty(required = True)
+    op_id = db.StringProperty(required = True)
+
+
 def render_str(template, **params):
     t = jinja_env.get_template(template)
     return t.render(params)
 
 class MainHandler(webapp2.RequestHandler):
+    """Page handler for page write & template rendering 
+
+    """ 
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
@@ -41,7 +59,10 @@ class MainHandler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-class MainPage(MainHandler):
+class HomePage(MainHandler):
+    """Home page
+
+    """ 
     def get(self):
         loader = Loader(open('data.csv'))
         kwargs = {"head": loader.head, "entry": loader.entry}
@@ -53,5 +74,5 @@ class MainPage(MainHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/', HomePage)
 ], debug=True)
