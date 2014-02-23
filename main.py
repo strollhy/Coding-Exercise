@@ -86,7 +86,7 @@ class HomePage(MainHandler):
         """ Upload data to database """
         form_create = self.request.get('create')
         if form_create:
-            self.redirect('/form?type=%s' % form_create)
+            self.redirect('/edit?type=%s' % form_create)
             return
             
         raw_file_name = self.request.POST.multi['file'].filename
@@ -166,5 +166,5 @@ class FormPage(MainHandler):
 
 app = webapp2.WSGIApplication([
     ('/', HomePage),
-    ('/form', FormPage)
+    ('/edit', FormPage)
 ], debug=True)
