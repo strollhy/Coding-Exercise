@@ -27,6 +27,9 @@
               <td>{{entry.route}}</td>
               <td>{{entry.number}}</td>
               <td>{{entry.op_id}}</td>
+              <td style="width:80px">
+                <a href="/form?number={{entry.number}};type=Edit">Edit</a>
+              </td>
             </tr>
           {% endfor %}
           </tbody>

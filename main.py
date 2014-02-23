@@ -29,6 +29,10 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 class Train(db.Model):
     """ Database entry class
 
+    Every train data has an unique and fixed run number
+    The run number can only be 'changed' by deleting the old one
+    and create a new one
+
     Attributes:
         line: Train line.
         route: Train route.
@@ -105,10 +109,9 @@ class HomePage(MainHandler):
             train = Train(**kwargs)
 
             # Check dupliaction
-            if train.check():
-                continue
-
-            train.put()
+            # uplaod data if run number is unique
+            if not train.check():
+               train.put()
 
 
 class FormPage(MainHandler):
@@ -117,25 +120,47 @@ class FormPage(MainHandler):
     def get(self):
         """ Load form update/edit page 
         """
-        form_type = self.request.get('type')
-        self.render("form.html", head = form_type)
+        kwargs = {}
+
+        kwargs['form_type'] = self.request.get('type')
+
+        number = self.request.get('number')
+        # Get the train entity
+        if number:
+            q = db.GqlQuery("SELECT * FROM Train WHERE number='%s'" % number).get()
+            kwargs['line'] = q.line
+            kwargs['route'] = q.route
+            kwargs['number'] = q.number
+            kwargs['op_id'] = q.op_id
+
+        self.render("form.html", **kwargs)
 
     def post(self):
         """ Create or update data
         """
         form_type = self.request.get('type')
-
         line = self.request.get('line')
         route = self.request.get('route')
         number = self.request.get('number')
-        op_id = self.request.get('op_id') 
-        
-        train = Train(line = line, route = route, number = number, op_id = op_id)
+        op_id = self.request.get('op_id')
 
         # Create new data
         if form_type == "Create":
+            train = Train(line=line, route=route, number=number, op_id=op_id)
             if not train.check():
                 train.put()
+
+        # Edit data back
+        # note that run number can't be changed
+        elif form_type == "Edit":
+            query = "SELECT * FROM Train WHERE number='%s'" % number
+            q = db.GqlQuery(query).get()
+            if q:
+                q.line = line
+                q.route = route
+                q.number = number
+                q.op_id = op_id
+                q.put()
 
         self.redirect('/')
 
