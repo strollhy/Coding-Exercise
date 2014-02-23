@@ -21,9 +21,10 @@
 				<tbody>
 				{% for entry in kwargs["entry"] %}
 					<tr>
-					{% for item in entry %}
-						<td>{{item}}</td>
-					{% endfor %}	
+						<td>{{entry.line}}</td>	
+						<td>{{entry.route}}</td>	
+						<td>{{entry.number}}</td>	
+						<td>{{entry.op_id}}</td>	
 					</tr>
 				{% endfor %}
 				</tbody>

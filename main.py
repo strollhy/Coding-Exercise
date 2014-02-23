@@ -27,7 +27,7 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
-class Entry(db.Model):
+class Train(db.Model):
     """ Database entry class
 
     Attributes:
@@ -59,19 +59,51 @@ class MainHandler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
+
 class HomePage(MainHandler):
     """Home page
 
     """ 
     def get(self):
-        loader = Loader(open('data.csv'))
-        kwargs = {"head": loader.head, "entry": loader.entry}
+        """ Load data from database """
+        entities = Train.all()
+        entities.order("number")
+
+        # Render template
+        kwargs = {"head": ['Train Line', 'Train route', 'Run number', 'Operator ID'], "entry": entities}
         self.render('index.html', kwargs = kwargs)
 
     def post(self):
+        """ Upload data to database """
+        raw_file_name = filename = self.request.POST.multi['file'].filename
         raw_file = self.request.POST.multi['file'].file
-        self.write(raw_file.read())
+        self.load(raw_file)
 
+    def load(self, filestream):
+        """ Load & parse csv data """
+        # Load head and each entry
+        head = [h.strip() for h in filestream.next().split(",")]
+        
+        for line in filestream:
+            # Load each item
+            row = [i.strip() for i in line.split(",")]
+            
+            # Check dupliaction
+            if self.check(row):
+                continue
+
+            # Map items to each attribute from Train
+            kwargs = dict(zip(['line', 'route','number','op_id'], row))
+
+            train = Train(**kwargs)
+            train.put()
+
+    def check(self, data):
+        """ Check dupliaction """
+        line, route, number, op_id = data
+        query = "SELECT * FROM Train WHERE number='%s'" % number
+        q = db.GqlQuery(query).get()
+        return q
 
 app = webapp2.WSGIApplication([
     ('/', HomePage)
