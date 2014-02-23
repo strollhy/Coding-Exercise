@@ -40,6 +40,12 @@ class Train(db.Model):
     number = db.StringProperty(required = True)
     op_id = db.StringProperty(required = True)
 
+    def check(self):
+        """ Check dupliaction """
+        query = "SELECT * FROM Train WHERE number='%s'" % self.number
+        q = db.GqlQuery(query).get()
+        return q
+
 
 def render_str(template, **params):
     t = jinja_env.get_template(template)
@@ -74,8 +80,14 @@ class HomePage(MainHandler):
 
     def post(self):
         """ Upload data to database """
-        raw_file_name = filename = self.request.POST.multi['file'].filename
+        form_create = self.request.get('create')
+        if form_create:
+            self.redirect('/form?type=%s' % form_create)
+            return
+            
+        raw_file_name = self.request.POST.multi['file'].filename
         raw_file = self.request.POST.multi['file'].file
+
         self.load(raw_file)
         self.redirect('/')
 
@@ -88,23 +100,46 @@ class HomePage(MainHandler):
             # Load each item
             row = [i.strip() for i in line.split(",")]
             
-            # Check dupliaction
-            if self.check(row):
-                continue
-
             # Map items to each attribute from Train
             kwargs = dict(zip(['line', 'route','number','op_id'], row))
-
             train = Train(**kwargs)
+
+            # Check dupliaction
+            if train.check():
+                continue
+
             train.put()
 
-    def check(self, data):
-        """ Check dupliaction """
-        line, route, number, op_id = data
-        query = "SELECT * FROM Train WHERE number='%s'" % number
-        q = db.GqlQuery(query).get()
-        return q
+
+class FormPage(MainHandler):
+    """ FormPage
+    """
+    def get(self):
+        """ Load form update/edit page 
+        """
+        form_type = self.request.get('type')
+        self.render("form.html", head = form_type)
+
+    def post(self):
+        """ Create or update data
+        """
+        form_type = self.request.get('type')
+
+        line = self.request.get('line')
+        route = self.request.get('route')
+        number = self.request.get('number')
+        op_id = self.request.get('op_id') 
+        
+        train = Train(line = line, route = route, number = number, op_id = op_id)
+
+        # Create new data
+        if form_type == "Create":
+            if not train.check():
+                train.put()
+
+        self.redirect('/')
 
 app = webapp2.WSGIApplication([
-    ('/', HomePage)
+    ('/', HomePage),
+    ('/form', FormPage)
 ], debug=True)

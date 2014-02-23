@@ -1,39 +1,42 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Wellspring Ex</title>
-		<link href="/static/bootstrap.css" rel="stylesheet">
-	</head>
+  <head>
+    <title>Wellspring Ex</title>
+    <link href="/static/bootstrap.css" rel="stylesheet">
+  </head>
     
-	<body>
-		<div class="container">
-			<h1>Wellspring Ex</h1>
-			<table class="table table-striped">
-				<thead>
-					<tr>
-					{% for head in kwargs["head"] %}
-						 <th>{{head}}</th>
-					{% endfor %}
-					</tr>
-				</thead>
-			
-				<tbody>
-				{% for entry in kwargs["entry"] %}
-					<tr>
-						<td>{{entry.line}}</td>	
-						<td>{{entry.route}}</td>	
-						<td>{{entry.number}}</td>	
-						<td>{{entry.op_id}}</td>	
-					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
+  <body>
+    <div class="container">
+      <h1>Wellspring Ex</h1>
 
-		  <form method="post" enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+            {% for head in kwargs["head"] %}
+               <th>{{head}}</th>
+            {% endfor %}
+            </tr>
+          </thead>
+        
+          <tbody>
+          {% for entry in kwargs["entry"] %}
+            <tr>
+              <td>{{entry.line}}</td>
+              <td>{{entry.route}}</td>
+              <td>{{entry.number}}</td>
+              <td>{{entry.op_id}}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+        <input type="submit" name="create" value="Create"><br />
+      
         <input type="file" name="file"><br />
         <input type="submit" value="Upload">
       </form>
-		</div>
-	</body>
+    </div>
+  </body>
 </html>
