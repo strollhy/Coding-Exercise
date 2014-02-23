@@ -123,8 +123,14 @@ class FormPage(MainHandler):
         kwargs = {}
 
         kwargs['form_type'] = self.request.get('type')
-
         number = self.request.get('number')
+
+        if kwargs['form_type'] == "Del" and number:
+            q = db.GqlQuery("SELECT * FROM Train WHERE number='%s'" % number).get()
+            q.delete()
+            self.redirect('/')
+            return
+        
         # Get the train entity
         if number:
             q = db.GqlQuery("SELECT * FROM Train WHERE number='%s'" % number).get()
